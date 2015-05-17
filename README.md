@@ -1,6 +1,6 @@
 # Introduction
 
-A Docker image for running a PowerDNS Recursor
+A Docker image for running a PowerDNS Recursor.  This image is published at <a href="https://registry.hub.docker.com/u/cloudhotspot/pdns-recursor/" target="_blank">cloudhotspot/pdns-recursor</a> on Docker Hub.
 
 ## Quick Start
 
