@@ -29,15 +29,38 @@ export-etc-hosts=yes
 ### Set Runtime Options
 You can pass any of the pdns_recursor options to the container (see <a href="https://doc.powerdns.com/md/manpages/pdns_recursor.1/" target="_blank">PowerDNS Recursor manpage</a>).
 
-### Example Runtime Options
-Disable exporting the local hosts files:
+For example, to disable exporting the local hosts files:
 ```console
 $ docker run -p 53:53/udp cloudhotspot/pdns-recursor --export-etc-hosts=no
 ```
 
-To export a zone file as authoritative, map a path on your Docker host with the zone file(s) to your container and use the `--auth-zones` flag
+### Quick and Dirty DNS Server
+To export a zone file as authoritative, map a path on your Docker host with the zone file(s) in BIND format (see example below) to your container and use the `--auth-zones` flag:
 ```console
 $ docker run -p 53:53/udp -v /path/to/share:/var/zones cloudhotspot/pdns-recursor --auth-zones=example.com=/var/zones/example.com
 ```
+This creates a quick and dirty DNS server without the usual ceremony.  Here is an example zone file:
 
+```shell
+$TTL	86400 ; 24 hours could have been written as 24h or 1d
+; $TTL used for all RRs without explicit TTL value
+$ORIGIN example.com.
+@  1D  IN  SOA ns1.example.com. hostmaster.example.com. (
+			      2002022401 ; serial
+			      3H ; refresh
+			      15 ; retry
+			      1w ; expire
+			      3h ; minimum
+			     )
+       IN  NS     ns1.example.com. ; in the domain
+       IN  NS     ns2.smokeyjoe.com. ; external to domain
+       IN  MX  10 mail.another.com. ; external mail provider
+; server host definitions
+ns1    IN  A      192.168.0.1  ;name server definition     
+www    IN  A      192.168.0.2  ;web server definition
+ftp    IN  CNAME  www.example.com.  ;ftp server definition
+; non server domain hosts
+bill   IN  A      192.168.0.3
+fred   IN  A      192.168.0.4
+```
 
